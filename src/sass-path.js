@@ -20,9 +20,12 @@ methods = {
 				names.push('_' + name);
 			});
 		}
-
 		return names.map(function (name) {
-			return relPath +'/'+ name;
+			if (relPath !== '.') {
+				return relPath +'/'+ name;
+			} else {
+				return name;
+			}
 		});
 	}
 };

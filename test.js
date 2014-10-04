@@ -35,7 +35,10 @@ describe('Finder', function () {
 
 	it('should find existing paths for sass imports', function () {
 		path = finder.normaliseSassPath('global', './utils/_tool.scss', standardDir);
-		path.should.equal('utils/global.scss');
+		path.should.equal('utils/global.scss');		
+
+		path = finder.normaliseSassPath('../global', './utils/_tool.scss', standardDir);
+		path.should.equal('global.scss');
 	});
 
 	it('should throw an error for ambiguous matches', function () {
@@ -51,30 +54,30 @@ describe('Import Paths', function () {
 	it('should return possible variants of a simple file name', function () {
 		paths = sassPath.getPaths('allTypes', 'main.scss', standardDir);
 		paths.length.should.equal(4);
-		paths.should.contain('./allTypes.scss');
-		paths.should.contain('./allTypes.sass');
-		paths.should.contain('./_allTypes.scss');
-		paths.should.contain('./_allTypes.sass');
+		paths.should.contain('allTypes.scss');
+		paths.should.contain('allTypes.sass');
+		paths.should.contain('_allTypes.scss');
+		paths.should.contain('_allTypes.sass');
 	});
 
 	it('should respect existing extensions', function () {
 		paths = sassPath.getPaths('scssOnly.scss', 'main.scss', standardDir);
 		paths.length.should.equal(2);
-		paths.should.contain('./scssOnly.scss');
-		paths.should.contain('./_scssOnly.scss');
+		paths.should.contain('scssOnly.scss');
+		paths.should.contain('_scssOnly.scss');
 	});
 
 	it('should respect existing underscores', function () {
 		paths = sassPath.getPaths('_underscored', 'main.scss', standardDir);
 		paths.length.should.equal(2);
-		paths.should.contain('./_underscored.scss');
-		paths.should.contain('./_underscored.sass');
+		paths.should.contain('_underscored.scss');
+		paths.should.contain('_underscored.sass');
 	});
 
 	it('should respect whole file names', function () {
 		paths = sassPath.getPaths('_simpleFile.scss', 'main.scss', standardDir);
 		paths.length.should.equal(1);
-		paths[0].should.equal('./_simpleFile.scss');
+		paths[0].should.equal('_simpleFile.scss');
 	});
 
 	it ('should return all paths relative to the base directory', function () {		

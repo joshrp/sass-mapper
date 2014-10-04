@@ -41,13 +41,13 @@ module.exports = {
 			.setEncoding('utf-8');
 	},
 
-	normaliseSassPath: function (path, file, basedir) {
-		paths = sassPath.getPaths(path, file, basedir);
+	normaliseSassPath: function (importPath, file, basedir) {
+		paths = sassPath.getPaths(importPath, file, basedir);
 		var possible = paths.filter(function (file) {
 			return fs.existsSync(basedir + '/' + file);
 		});
 		if (possible.length > 1) {
-			throw new Error('Ambiguous match for ' + path + ' in ' + file);
+			throw new Error('Ambiguous match for ' + importPath + ' in ' + file);
 		} else {
 			return possible[0];
 		}
