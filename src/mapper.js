@@ -1,14 +1,17 @@
 var finder = require('./finder'),
 	crypto = require('crypto'),
+	async = require('async'),
+	fs = require('fs'),
 	path = require('path'),
 	methods = {
 		getFiles: function (dir, cb) {
-			var basedir = path.dirname(dir);
-
 			finder.findAll(dir, function (err, files) {
-				if (err) throw err;
+				if (err) {
+					cb (err);
+				}
+
 				files = files.map(function (file) {
-					return path.relative(basedir, file);
+					return file;
 				});
 				cb(err, files);
 			});
@@ -20,7 +23,33 @@ var finder = require('./finder'),
 				var deps = imports.map(function (importFileName) {
 					return finder.normaliseSassPath(importFileName, file, basedir);
 				});
-				cb(null, deps)
+				cb(null, deps);
+			});
+		},
+		getDependencyTree: function (dir, cb) {
+			stats = fs.statSync(dir);
+			var basedir,
+				map = {};
+
+			if (stats.isFile()) {
+				basedir = path.dirname(dir);
+			} else {
+				basedir = dir;
+			}
+
+			methods.getFiles(dir, function (err, allFiles) {
+				async.map(allFiles, function (file, cb) {
+					methods.getDependencies(file, basedir, function (err, files) {
+						var ret = [file, files];
+						cb(err, ret);
+					});
+				}, function (err, results) {
+					results.forEach(function (item) {
+						map[path.relative(basedir, item[0])] = item[1];
+					});
+					cb (err, map);
+				});
+
 			});
 		}
 	};

@@ -42,8 +42,8 @@ describe('Finder', function () {
 		(function () {
 			path = finder.normaliseSassPath('somestuff', './main.scss', ambiguousDir);
 			path.should.equal('utils/global.scss');		
-		}).should.throw()
-	})
+		}).should.throw();
+	});
 });
 
 describe('Import Paths', function () {
@@ -98,14 +98,15 @@ describe('Mapper', function () {
 		var mapper = require('./src/mapper');
 		mapper.getFiles(standardDir, function (err, files) {
 			files.length.should.equal(10);
-			files.forEach(function (file){
-				file.should.not.match(new RegExp('^' + standardDir));
-			});	
+			files.should.contain(standardDir + '/_page1.scss');
+			files.should.contain(standardDir + '/global.scss');
+			files.should.contain(standardDir + '/main.scss');
+			files.should.contain(standardDir + '/utils/_tool.scss');
 			done();
 		});
 	});
 
-	it('should get file dependencies', function (done) {
+	it('should get individual file dependencies', function (done) {
 		var mapper = require('./src/mapper');
 		mapper.getDependencies(standardDir + '/utils/_tool.scss', standardDir, function (err, files) {
 			files.length.should.equal(2);
@@ -120,6 +121,25 @@ describe('Mapper', function () {
 		mapper.getDependencies('_content.scss', standardDir + '/partials/page1', function (err, files) {
 			files.length.should.equal(1);
 			files[0].should.equal('../list/_main.scss');
+			done();
+		});
+	});
+
+	it('should get dependency tree of files', function (done) {
+		var mapper = require('./src/mapper');
+		mapper.getDependencyTree(standardDir, function (err, map) {
+			Object.keys(map).length.should.equal(10);
+			map['main.scss'].length.should.equal(2);
+			done();
+		});
+	});
+
+	it('dependencies should include those outside the base directory', function (done) {
+		var mapper = require('./src/mapper');
+		mapper.getDependencyTree(standardDir + '/partials/page1', function (err, map) {
+			Object.keys(map).length.should.equal(3);
+			map['_content.scss'].length.should.equal(1);
+			map['_content.scss'][0].should.equal('../list/_main.scss');
 			done();
 		});
 	});
