@@ -1,0 +1,10 @@
+@import 'partials/page1/banner';
+
+.someCss {
+	background: pink;
+	@include red;
+}
+
+@import 'partials/page1/content';
+
+@import "partials/page1/footer";
