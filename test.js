@@ -3,6 +3,7 @@ var mocha = require('mocha'),
 	path = require('path'),
 	fixturesDir = path.resolve('fixtures'),
 	standardDir = fixturesDir + '/standard';
+	ambiguousDir = fixturesDir + '/ambiguous';
 
 describe('Finder', function () {
 	var finder = require('./src/finder');
@@ -14,7 +15,7 @@ describe('Finder', function () {
 	});
 
 	it('should get basic imported files from file', function (done) {
-		finder.getImportedFiles('main.scss', standardDir, function (err, files) {
+		finder.getImportedFiles(standardDir + '/main.scss', function (err, files) {
 			files.length.should.equal(2);
 			files[0].should.equal('./utils/tool.scss');
 			files[1].should.equal('page1');
@@ -23,7 +24,7 @@ describe('Finder', function () {
 	});
 
 	it('should get imported files anywhere in the file', function (done) {
-		finder.getImportedFiles('_page1.scss', standardDir, function (err, files) {
+		finder.getImportedFiles(standardDir + '/_page1.scss', function (err, files) {
 			files.length.should.equal(3);
 			files[0].should.equal('partials/page1/banner');
 			files[1].should.equal('partials/page1/content');
@@ -31,6 +32,18 @@ describe('Finder', function () {
 			done();
 		});
 	});
+
+	it('should find existing paths for sass imports', function () {
+		path = finder.normaliseSassPath('global', './utils/_tool.scss', standardDir);
+		path.should.equal('utils/global.scss');
+	});
+
+	it('should throw an error for ambiguous matches', function () {
+		(function () {
+			path = finder.normaliseSassPath('somestuff', './main.scss', ambiguousDir);
+			path.should.equal('utils/global.scss');		
+		}).should.throw()
+	})
 });
 
 describe('Import Paths', function () {
@@ -92,12 +105,22 @@ describe('Mapper', function () {
 		});
 	});
 
-	// it('should assign basic relationships', function (done) {
-	// 	var mapper = require('./src/mapper');
-	// 	mapper.getFiles(standardDir, function (err, files) {
-	// 		files.length.should.equal(6);
-	// 		files[0].dependsOn.length.should.equal(2);
-	// 		done();
-	// 	});
-	// });
+	it('should get file dependencies', function (done) {
+		var mapper = require('./src/mapper');
+		mapper.getDependencies(standardDir + '/utils/_tool.scss', standardDir, function (err, files) {
+			files.length.should.equal(2);
+			files[0].should.equal('utils/_common.scss');
+			files[1].should.equal('utils/global.scss');
+			done();
+		});		
+	});
+
+	it('should get file dependencies outside of the base dir', function (done) {
+		var mapper = require('./src/mapper');
+		mapper.getDependencies('_content.scss', standardDir + '/partials/page1', function (err, files) {
+			files.length.should.equal(1);
+			files[0].should.equal('../list/_main.scss');
+			done();
+		});
+	});
 });

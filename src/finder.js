@@ -1,9 +1,10 @@
 var recursive = require('recursive-readdir'),
 	fs = require('fs'),
 	byline = require('byline'),
+	sassPath = require('./sass-path'),
 	path = require('path'),
 	sassFileMatcher = /^_?.*.s(c|a)ss$/;
-	importMatcher = /^@import ("|')([^"']*)("|');$/;
+	importMatcher = /^@import ("|')([^"']*)("|');?$/;
 
 module.exports = {
 	findAll: function (dir, cb) {
@@ -24,11 +25,10 @@ module.exports = {
 		});
 	},
 
-	getImportedFiles: function (file, baseDir, cb) {
-		var abPath = path.resolve(baseDir, file),
-			imports = [];
+	getImportedFiles: function (file, cb) {
+		var imports = [];
 
-		byline(fs.createReadStream(abPath))
+		byline(fs.createReadStream(file))
 			.on('data', function (chunk) {
 				matches = importMatcher.exec(chunk);
 				if (matches !== null) {
@@ -39,5 +39,17 @@ module.exports = {
 				cb(null, imports);
 			})
 			.setEncoding('utf-8');
+	},
+
+	normaliseSassPath: function (path, file, basedir) {
+		paths = sassPath.getPaths(path, file, basedir);
+		var possible = paths.filter(function (file) {
+			return fs.existsSync(basedir + '/' + file);
+		});
+		if (possible.length > 1) {
+			throw new Error('Ambiguous match for ' + path + ' in ' + file);
+		} else {
+			return possible[0];
+		}
 	}
 };

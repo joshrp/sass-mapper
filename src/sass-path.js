@@ -22,7 +22,7 @@ methods = {
 		}
 
 		return names.map(function (name) {
-			return 	relPath +'/'+ name;
+			return relPath +'/'+ name;
 		});
 	}
 };
