@@ -34,3 +34,9 @@ An example run from the `fixtures/standard` directory of this project
   "partials/page1/_footer.scss": []
 }
 ```
+
+Usage
+=====
+Pass the path to some files you want mapping. Everything file in the directory will be mapped.
+
+`node ./src/main.js fixtures/standard`
