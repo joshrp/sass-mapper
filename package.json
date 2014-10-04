@@ -29,6 +29,7 @@
     "should": "^4.0.4"
   },
   "dependencies": {
+    "byline": "^4.1.1",
     "recursive-readdir": "^1.2.0"
   }
 }

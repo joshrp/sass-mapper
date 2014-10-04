@@ -12,7 +12,7 @@ var finder = require('./finder'),
 				});
 				cb(err, files);
 			});
-		}
+		},
 	};
 
 module.exports = methods;

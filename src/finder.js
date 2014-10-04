@@ -1,8 +1,9 @@
 var recursive = require('recursive-readdir'),
 	fs = require('fs'),
-	sassPath = require('./sass-path'),
+	byline = require('byline'),
 	path = require('path'),
-	matcher = /^_?.*.s(c|a)ss$/;
+	sassFileMatcher = /^_?.*.s(c|a)ss$/;
+	importMatcher = /^@import ("|')([^"']*)("|');$/;
 
 module.exports = {
 	findAll: function (dir, cb) {
@@ -11,15 +12,32 @@ module.exports = {
 				if (err.code === 'ENOTDIR') {
 					allFiles = [dir];
 				} else {
- 					cb(err);
+					cb(err);
 				}
 			}
 			var files = allFiles.filter(function (file) {
-				return matcher.test(path.basename(file));
+				return sassFileMatcher.test(path.basename(file));
 			}).map(function (file) {
 				return path.resolve(file);
 			});
 			cb(null, files);
 		});
+	},
+
+	getImportedFiles: function (file, baseDir, cb) {
+		var abPath = path.resolve(baseDir, file),
+			imports = [];
+
+		byline(fs.createReadStream(abPath))
+			.on('data', function (chunk) {
+				matches = importMatcher.exec(chunk);
+				if (matches !== null) {
+					imports.push(matches[2]);
+				}
+			})
+			.on('end', function () {
+				cb(null, imports);
+			})
+			.setEncoding('utf-8');
 	}
 };

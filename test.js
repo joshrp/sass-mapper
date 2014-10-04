@@ -5,10 +5,29 @@ var mocha = require('mocha'),
 	standardDir = fixturesDir + '/standard';
 
 describe('Finder', function () {
+	var finder = require('./src/finder');
 	it('should find files correctly', function (done) {
-		var finder = require('./src/finder');
 		finder.findAll(standardDir, function (err, 	files) {
 			files.length.should.equal(10);
+			done();
+		});
+	});
+
+	it('should get basic imported files from file', function (done) {
+		finder.getImportedFiles('main.scss', standardDir, function (err, files) {
+			files.length.should.equal(2);
+			files[0].should.equal('./utils/tool.scss');
+			files[1].should.equal('page1');
+			done();
+		});		
+	});
+
+	it('should get imported files anywhere in the file', function (done) {
+		finder.getImportedFiles('_page1.scss', standardDir, function (err, files) {
+			files.length.should.equal(3);
+			files[0].should.equal('partials/page1/banner');
+			files[1].should.equal('partials/page1/content');
+			files[2].should.equal('partials/page1/footer');
 			done();
 		});
 	});
