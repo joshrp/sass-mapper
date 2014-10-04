@@ -17,7 +17,7 @@
     "graph"
   ],
   "author": "Josh Priestley",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/joshrp/sass-mapper/issues"
   },
