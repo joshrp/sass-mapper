@@ -3,6 +3,7 @@ var finder = require('./finder'),
 	async = require('async'),
 	fs = require('fs'),
 	path = require('path'),
+    pattern = process.argv[3] || false,
 	methods = {
 		getFiles: function (dir, cb) {
 			finder.findAll(dir, function (err, files) {
@@ -10,9 +11,22 @@ var finder = require('./finder'),
 					cb (err);
 				}
 
-				files = files.map(function (file) {
-					return file;
-				});
+				files = files
+					.map(function (file) {
+						if (pattern) {
+							var patternSplit = pattern.split('/'),
+								match = new RegExp(patternSplit[1], patternSplit[2]);
+							if (file.match(match) === null) {
+								return file;
+							}
+						} else {
+							return file;
+						}
+					})
+					.filter(function (file) {
+						return (file !== undefined);
+					});
+					
 				cb(err, files);
 			});
 		},
