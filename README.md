@@ -1,9 +1,10 @@
 Sass Mapper
 -----------
+<img src="https://travis-ci.com/joshrp/sass-mapper.svg?branch=master">
 
 Dependency tree builder for sass projects
 
-Exmaple 
+Exmaple
 =======
 An example run from the `fixtures/standard` directory of this project
 ```json
