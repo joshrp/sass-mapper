@@ -25,7 +25,7 @@
   "devDependencies": {
     "chai": "^1.9.2",
     "jshint": "^2.5.6",
-    "mocha": "^6.2.0",
+    "mocha": "^10.2.0",
     "should": "^4.0.4"
   },
   "dependencies": {
